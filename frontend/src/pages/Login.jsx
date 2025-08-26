@@ -1,42 +1,36 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-export default function Login(){
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@demo.com');
-  const [password, setPassword] = useState('123456');
-  const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-      await login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err?.response?.data?.message || 'Usuario o contraseña incorrectos.');
-    }
-  };
+export default function Register(){
+const { register } = useAuth();
+const [form, setForm] = useState({ nombre:'', apellido:'', email:'', password:'' });
+const [msg, setMsg] = useState('');
+const [err, setErr] = useState('');
 
-  return (
-    <div className="container" style={{maxWidth: 420}}>
-      <div className="card">
-        <h2>Iniciar sesión</h2>
-        <form onSubmit={handleSubmit} className="grid">
-          <div>
-            <label>Email</label>
-            <input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="tu@email.com" />
-          </div>
-          <div>
-            <label>Clave</label>
-            <input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="••••••" />
-          </div>
-          {error && <div style={{color:'#f87171'}}>{error}</div>}
-          <button className="btn" type="submit">Ingresar</button>
-        </form>
-      </div>
-    </div>
-  )
+
+const submit = async (e) => {
+e.preventDefault(); setErr(''); setMsg('');
+if(!/^\d{10}$/.test(form.password)) return setErr('La clave debe tener 10 dígitos numéricos.');
+try { const r = await register(form); setMsg(r.msg || 'Revisa tu correo para confirmar.'); }
+catch(e){ setErr(e?.response?.data?.msg || 'Error al registrar'); }
+};
+
+
+return (
+<div className="container" style={{maxWidth: 520}}>
+<div className="card">
+<h2>Crear cuenta</h2>
+<form onSubmit={submit} className="grid">
+<input placeholder="Nombre" value={form.nombre} onChange={e=>setForm({...form, nombre:e.target.value})} />
+<input placeholder="Apellido" value={form.apellido} onChange={e=>setForm({...form, apellido:e.target.value})} />
+<input type="email" placeholder="Email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} />
+<input type="password" placeholder="Clave (10 dígitos)" maxLength={10} value={form.password} onChange={e=>setForm({...form, password:e.target.value})} />
+<button className="btn" type="submit">Registrarme</button>
+{msg && <div style={{color:'#16a34a'}}>{msg}</div>}
+{err && <div style={{color:'#dc2626'}}>{err}</div>}
+</form>
+</div>
+</div>
+);
 }

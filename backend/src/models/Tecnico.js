@@ -1,15 +1,19 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import { toJSONOpts } from './_helpers.js';
 
-const TecnicoSchema = new mongoose.Schema({
-  nombre: String,
-  apellido: String,
-  cedula: { type: String, unique: true },
-  fecha_nacimiento: Date,
-  genero: String,
-  ciudad: String,
-  direccion: String,
-  telefono: String,
-  email: String
+
+const schema = new mongoose.Schema({
+nombre: { type: String, required: true },
+apellido: { type: String, required: true },
+cedula: { type: String, unique: true },
+fecha_nacimiento: Date,
+genero: String,
+ciudad: String,
+direccion: String,
+telefono: String,
+email: String
 }, { timestamps: true });
 
-export default mongoose.model("Tecnico", TecnicoSchema);
+
+schema.set('toJSON', toJSONOpts);
+export default mongoose.model('Tecnico', schema);

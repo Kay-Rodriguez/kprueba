@@ -1,17 +1,14 @@
-:root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --accent:#6366f1; }
-* { box-sizing: border-box; }
-body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial; background: #0b1021; color: white; }
-a { color: var(--accent); text-decoration: none; }
-.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
-.card { background: #121826; border:1px solid #1f2937; border-radius: 16px; padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
-input, select, button, textarea { padding: 10px; border-radius: 10px; border:1px solid #374151; background:#0f172a; color: white; }
-button { cursor:pointer; }
-.btn { background: var(--accent); border:none; padding: 10px 16px; border-radius: 10px; color: #fff; }
-.btn.secondary { background:#334155; }
-table { width:100%; border-collapse: collapse; }
-th, td { border-bottom:1px solid #1f2937; padding: 10px; text-align: left; }
-.actions { display:flex; gap:8px; }
-.nav { display:flex; gap: 12px; margin-bottom: 20px; }
-.flex { display:flex; gap:14px; }
-.grid { display:grid; gap:16px; grid-template-columns: repeat(2, minmax(0,1fr)); }
-@media (max-width: 800px){ .grid { grid-template-columns: 1fr; } }
+:root{ --c:#111827; --b:#f3f4f6; --p:#2563eb; }
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:ui-sans-serif,system-ui,Segoe UI,Roboto; background:#eef2f7; color:var(--c);}
+.container{ max-width:980px; margin:0 auto; padding:16px; }
+.card{ background:white; border-radius:16px; padding:16px 20px; box-shadow:0 6px 16px rgba(0,0,0,.06); }
+.grid{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+.flex{ display:flex; gap:8px; }
+.btn{ background:var(--p); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; }
+.btn.secondary{ background:#6b7280; }
+input,select{ width:100%; padding:10px; border:1px solid #d1d5db; border-radius:10px; }
+.nav a{ margin-right:12px; text-decoration:none; color:var(--c); }
+.table{ width:100%; }
+.table th,.table td{ padding:8px; }
+.actions button{ margin-right:6px; }

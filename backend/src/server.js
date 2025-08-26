@@ -1,20 +1,32 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import routerUsuarios from './routers/usuario_routes.js'
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connection from './config/database.js';
 
-dotenv.config()
-const app = express()
 
-app.set('port', process.env.PORT || 3000)
-app.use(cors())
-app.use(express.json())
-app.use('/api', routerUsuarios)
+import authRoutes from './routers/auth_routes.js';
+import clientesRoutes from './routers/clientes_routes.js';
+import tecnicosRoutes from './routers/tecnicos_routes.js';
+import ticketsRoutes from './routers/tickets_routes.js';
 
-app.get('/', (req, res) => {
-    res.send("Server on")
-})
 
-app.use((req, res) => res.status(404).send("Endpoint no encontrado - 404"))
+dotenv.config();
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-export default app
+
+connection();
+
+
+app.use('/api/auth', authRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/tecnicos', tecnicosRoutes);
+app.use('/api/tickets', ticketsRoutes);
+
+
+app.get('/', (_req, res) => res.send('API funcionando 🚀'));
+
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`✅ Backend en http://localhost:${PORT}`));

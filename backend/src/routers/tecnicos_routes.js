@@ -1,14 +1,15 @@
-import express from "express";
-import {crearTecnico, listarTecnicos,obtenerTecnico,actualizarTecnico, eliminarTecnico
-} from "../controllers/tecnicos_controller.js";
-import { verificarAuth } from "../middlewares/auth.js";
+import { Router } from 'express';
+import { verificarAuth } from '../middlewares/auth.js';
+import { crear, listar, obtener, actualizar, eliminar } from '../controllers/tecnicos_controller.js';
+const r = Router();
 
-const router = express.Router();
 
-router.post("/", verificarAuth, crearTecnico);
-router.get("/", verificarAuth, listarTecnicos);
-router.get("/:id", verificarAuth, obtenerTecnico);
-router.put("/:id", verificarAuth, actualizarTecnico);
-router.delete("/:id", verificarAuth, eliminarTecnico);
+r.use(verificarAuth);
+r.post('/', crear);
+r.get('/', listar);
+r.get('/:id', obtener);
+r.put('/:id', actualizar);
+r.delete('/:id', eliminar);
 
-export default router;
+
+export default r;

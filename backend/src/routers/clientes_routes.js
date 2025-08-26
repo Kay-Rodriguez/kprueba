@@ -1,19 +1,15 @@
-import express from "express";
-import {
-  crearCliente,
-  listarClientes,
-  obtenerCliente,
-  actualizarCliente,
-  eliminarCliente
-} from "../controllers/clientes_controller.js";
-import { verificarAuth } from "../middlewares/auth.js";
+import { Router } from 'express';
+import { verificarAuth } from '../middlewares/auth.js';
+import { crear, listar, obtener, actualizar, eliminar } from '../controllers/clientes.controller.js';
+const r = Router();
 
-const router = express.Router();
 
-router.post("/", verificarAuth, crearCliente);
-router.get("/", verificarAuth, listarClientes);
-router.get("/:id", verificarAuth, obtenerCliente);
-router.put("/:id", verificarAuth, actualizarCliente);
-router.delete("/:id", verificarAuth, eliminarCliente);
+r.use(verificarAuth);
+r.post('/', crear);
+r.get('/', listar);
+r.get('/:id', obtener);
+r.put('/:id', actualizar);
+r.delete('/:id', eliminar);
 
-export default router;
+
+export default r;

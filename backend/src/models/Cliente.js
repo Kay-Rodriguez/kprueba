@@ -1,47 +1,19 @@
-import mongoose, {Schema,model} from 'mongoose'
+import mongoose from 'mongoose';
+import { toJSONOpts } from './_helpers.js';
 
 
-const ClienteSchema = new mongoose.Schema({
-    nombre:{type:String,required:true,trim:true },
-    cedula:{
-        type:String,
-        required:true,
-        trim:true },
-    email:{
-        type:String,
-        required:true,
-        trim:true,
-        unique: true
-    },
-    telefono:{
-        type:String,
-        required:true,
-        trim:true
-    },
-    apellido:{
-        type:String,
-        trim:true
-    },
-    ciudad:{
-        type:String,
-        trim:true
-    },
-    direccion:{
-        type:String,
-        required:true,
-        trim:true
-    },
-    fecha_nacimiento:{
-        type:Date,
-        required:true,
-        trim:true
-    },
-    dependencia:{
-        type:String,
-        required:true,
-        trim:true
-    },
-    
-},{ timestamps:true});
+const schema = new mongoose.Schema({
+nombre: { type: String, required: true, trim: true },
+apellido: { type: String, trim: true },
+cedula: { type: String, required: true, trim: true },
+ciudad: { type: String, trim: true },
+email: { type: String, required: true, trim: true, unique: true },
+direccion: { type: String, required: true, trim: true },
+telefono: { type: String, required: true, trim: true },
+fecha_nacimiento: { type: Date, required: true },
+dependencia: { type: String, required: true, trim: true }
+}, { timestamps: true });
 
-export default mongoose.model('Cliente', ClienteSchema);
+
+schema.set('toJSON', toJSONOpts);
+export default mongoose.model('Cliente', schema);
