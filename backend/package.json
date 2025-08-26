@@ -1,12 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
+  "main": "./src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
-  
+    "start": "node src/index.js",
+    "test": "node -v && echo \"(sin tests por ahora)\""
   },
   "keywords": [],
   "author": "",
