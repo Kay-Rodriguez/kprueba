@@ -1,55 +1,18 @@
-import Cliente from "../models/Cliente.js";
+import Cliente from '../models/Cliente.js';
 
-// Crear cliente
-export const crearCliente = async (req, res) => {
-  try {
-    const cliente = new Cliente(req.body);
-    await cliente.save();
-    res.json({ msg: "Cliente creado correctamente", cliente });
-  } catch (error) {
-    res.status(400).json({ msg: "Error al crear cliente", error });
-  }
+
+export const crear = async (req, res) => {
+try { const c = await Cliente.create(req.body); return res.json(c); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Listar todos
-export const listarClientes = async (req, res) => {
-  try {
-    const clientes = await Cliente.find();
-    res.json(clientes);
-  } catch (error) {
-    res.status(400).json({ msg: "Error al listar clientes", error });
-  }
+export const listar = async (_req, res) => {
+try { const r = await Cliente.find(); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Obtener uno
-export const obtenerCliente = async (req, res) => {
-  try {
-    const cliente = await Cliente.findById(req.params.id);
-    if (!cliente) return res.status(404).json({ msg: "Cliente no encontrado" });
-    res.json(cliente);
-  } catch (error) {
-    res.status(400).json({ msg: "Error al obtener cliente", error });
-  }
+export const obtener = async (req, res) => {
+try { const r = await Cliente.findById(req.params.id); if (!r) return res.status(404).json({ msg: 'No encontrado' }); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Actualizar
-export const actualizarCliente = async (req, res) => {
-  try {
-    const cliente = await Cliente.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!cliente) return res.status(404).json({ msg: "Cliente no encontrado" });
-    res.json({ msg: "Cliente actualizado", cliente });
-  } catch (error) {
-    res.status(400).json({ msg: "Error al actualizar cliente", error });
-  }
+export const actualizar = async (req, res) => {
+try { const r = await Cliente.findByIdAndUpdate(req.params.id, req.body, { new: true }); if (!r) return res.status(404).json({ msg: 'No encontrado' }); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Eliminar
-export const eliminarCliente = async (req, res) => {
-  try {
-    const cliente = await Cliente.findByIdAndDelete(req.params.id);
-    if (!cliente) return res.status(404).json({ msg: "Cliente no encontrado" });
-    res.json({ msg: "Cliente eliminado" });
-  } catch (error) {
-    res.status(400).json({ msg: "Error al eliminar cliente", error });
-  }
+export const eliminar = async (req, res) => {
+try { const r = await Cliente.findByIdAndDelete(req.params.id); if (!r) return res.status(404).json({ msg: 'No encontrado' }); return res.json({ msg: 'Eliminado' }); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };

@@ -1,55 +1,18 @@
-import Tecnico from "../models/Tecnico.js";
+import Tecnico from '../models/Tecnico.js';
 
-// Crear técnico
-export const crearTecnico = async (req, res) => {
-  try {
-    const tecnico = new Tecnico(req.body);
-    await tecnico.save();
-    res.json({ msg: "Técnico creado correctamente", tecnico });
-  } catch (error) {
-    res.status(400).json({ msg: "Error al crear técnico", error });
-  }
+
+export const crear = async (req, res) => {
+try { const r = await Tecnico.create(req.body); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Listar
-export const listarTecnicos = async (req, res) => {
-  try {
-    const tecnicos = await Tecnico.find();
-    res.json(tecnicos);
-  } catch (error) {
-    res.status(400).json({ msg: "Error al listar técnicos", error });
-  }
+export const listar = async (_req, res) => {
+try { const r = await Tecnico.find(); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Obtener uno
-export const obtenerTecnico = async (req, res) => {
-  try {
-    const tecnico = await Tecnico.findById(req.params.id);
-    if (!tecnico) return res.status(404).json({ msg: "Técnico no encontrado" });
-    res.json(tecnico);
-  } catch (error) {
-    res.status(400).json({ msg: "Error al obtener técnico", error });
-  }
+export const obtener = async (req, res) => {
+try { const r = await Tecnico.findById(req.params.id); if (!r) return res.status(404).json({ msg: 'No encontrado' }); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Actualizar
-export const actualizarTecnico = async (req, res) => {
-  try {
-    const tecnico = await Tecnico.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!tecnico) return res.status(404).json({ msg: "Técnico no encontrado" });
-    res.json({ msg: "Técnico actualizado", tecnico });
-  } catch (error) {
-    res.status(400).json({ msg: "Error al actualizar técnico", error });
-  }
+export const actualizar = async (req, res) => {
+try { const r = await Tecnico.findByIdAndUpdate(req.params.id, req.body, { new: true }); if (!r) return res.status(404).json({ msg: 'No encontrado' }); return res.json(r); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };
-
-// Eliminar
-export const eliminarTecnico = async (req, res) => {
-  try {
-    const tecnico = await Tecnico.findByIdAndDelete(req.params.id);
-    if (!tecnico) return res.status(404).json({ msg: "Técnico no encontrado" });
-    res.json({ msg: "Técnico eliminado" });
-  } catch (error) {
-    res.status(400).json({ msg: "Error al eliminar técnico", error });
-  }
+export const eliminar = async (req, res) => {
+try { const r = await Tecnico.findByIdAndDelete(req.params.id); if (!r) return res.status(404).json({ msg: 'No encontrado' }); return res.json({ msg: 'Eliminado' }); } catch (e) { return res.status(400).json({ msg: e.message }); }
 };

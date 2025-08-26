@@ -1,19 +1,15 @@
-import express from "express";
-import {
-  crearTicket,
-  listarTickets,
-  obtenerTicket,
-  actualizarTicket,
-  eliminarTicket
-} from "../controllers/tickets_controller.js";
-import { verificarAuth } from "../middlewares/auth.js";
+import { Router } from 'express';
+import { verificarAuth } from '../middlewares/auth.js';
+import { crear, listar, obtener, actualizar, eliminar } from '../controllers/tickets_controller.js';
+const r = Router();
 
-const router = express.Router();
 
-router.post("/", verificarAuth, crearTicket);
-router.get("/", verificarAuth, listarTickets);
-router.get("/:id", verificarAuth, obtenerTicket);
-router.put("/:id", verificarAuth, actualizarTicket);
-router.delete("/:id", verificarAuth, eliminarTicket);
+r.use(verificarAuth);
+r.post('/', crear);
+r.get('/', listar);
+r.get('/:id', obtener);
+r.put('/:id', actualizar);
+r.delete('/:id', eliminar);
 
-export default router;
+
+export default r;
