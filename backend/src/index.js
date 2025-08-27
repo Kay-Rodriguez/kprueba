@@ -11,15 +11,39 @@ import ticketsRoutes from './routers/tickets_routes.js';
 
 const app = express();
 
-// Config desde .env con defaults sensatos
-const JSON_LIMIT = process.env.JSON_LIMIT || '2mb';
-const TRUST_PROXY = String(process.env.TRUST_PROXY ?? 'false') === 'true';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || true;
+// --- Config desde .env con defaults sensatos ---
+const JSON_LIMIT       = process.env.JSON_LIMIT || '2mb';
+const TRUST_PROXY      = String(process.env.TRUST_PROXY ?? 'false') === 'true';
 const CORS_CREDENTIALS = String(process.env.CORS_CREDENTIALS ?? 'true') === 'true';
 
+// Soporta múltiples orígenes separados por coma
+// Ej: CORS_ORIGIN=https://kprueba.vercel.app,http://localhost:5173
+const ORIGINS_RAW = (process.env.CORS_ORIGIN || '').trim();
+const ALLOWED_ORIGINS = ORIGINS_RAW
+  ? ORIGINS_RAW.split(',').map(s => s.trim().replace(/\/$/, ''))
+  : [];
+
 // --- Middlewares base ---
+app.disable('x-powered-by');
 if (TRUST_PROXY) app.set('trust proxy', 1);
-app.use(cors({ origin: CORS_ORIGIN, credentials: CORS_CREDENTIALS }));
+
+// CORS robusto con lista blanca
+const corsOptions = {
+  origin(origin, cb) {
+    // Permite llamadas sin Origin (health checks, curl, cron internos)
+    if (!origin) return cb(null, true);
+
+    const clean = origin.replace(/\/$/, '');
+    if (ALLOWED_ORIGINS.includes(clean)) return cb(null, true);
+
+    return cb(new Error(`Origen no permitido por CORS: ${origin}`));
+  },
+  credentials: CORS_CREDENTIALS,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
+
+// Parsers
 app.use(express.json({ limit: JSON_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT }));
 
@@ -27,7 +51,7 @@ app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT }));
 const mongoStateText = (state) =>
   (['disconnected', 'connected', 'connecting', 'disconnecting'][state] || 'unknown');
 
-// --- Rutas ---
+// --- Rutas públicas básicas ---
 app.get('/', (_req, res) => res.send('API funcionando 🚀'));
 
 app.get('/health', async (_req, res) => {
@@ -54,6 +78,7 @@ app.get('/health', async (_req, res) => {
   res.status(payload.ok ? 200 : 503).json(payload);
 });
 
+// --- API ---
 app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/tecnicos', tecnicosRoutes);
@@ -65,6 +90,11 @@ app.use((req, res) => {
 });
 
 app.use((err, _req, res, _next) => {
+  // Si el error viene de CORS, responde 403 para que sea claro en el front
+  if (String(err.message || '').startsWith('Origen no permitido por CORS')) {
+    return res.status(403).json({ error: err.message });
+  }
+
   console.error('❌ Error no controlado:', err);
   const status = Number(err.status || 500);
   res.status(status).json({
