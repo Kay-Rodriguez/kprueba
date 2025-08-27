@@ -1,7 +1,8 @@
-// src/controllers/auth_controller.js
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import Usuario from '../models/Cuentas.js';
+// ⚠️ Asegúrate que este import coincida con tu archivo/modelo real
+// Si tu modelo está en Cuentas.js usa:  import Usuario from '../models/Cuentas.js';
+import Usuario from '../models/Usuarios.js';
 import { sendVerification, sendPasswordReset } from '../mail/mailer.js';
 
 const generarToken = (id) =>
@@ -80,40 +81,30 @@ export const login = async (req, res) => {
   }
 };
 
-
-/**
- * GET /confirm/:token
- */
+/** GET /confirm/:token  — idempotente */
 export const confirmar = async (req, res) => {
   try {
     const { token } = req.params;
-    console.log('[confirmar] hit con token:', token);
-
     const user = await Usuario.findOne({ verificationToken: token });
 
     if (user) {
-      console.log('[confirmar] usuario encontrado:', { id: user.id, verified: user.verified });
       if (!user.verified) {
         user.verified = true;
-        user.verificationToken = null;
+        user.verificationToken = null; // consumir token
         await user.save();
-        console.log('[confirmar] token consumido y verificado');
-      } else {
-        console.log('[confirmar] ya estaba verificado');
       }
+      // 200 siempre para evitar “falso error” si hay doble llamada
       return res.json({ msg: 'Cuenta verificada correctamente' });
     }
 
-    console.log('[confirmar] token no encontrado (posible 2da llamada)');
+    // Token inexistente/ya usado → mensaje neutro
     return res.status(200).json({ msg: 'El enlace ya fue utilizado o la cuenta ya está confirmada.' });
   } catch (e) {
-    console.error('[confirmar] error:', e);
     return res.status(500).json({ msg: e.message });
   }
 };
 
-/**
- * POST /forgot
+/** POST /forgot
  * body: { email }
  */
 export const solicitarReset = async (req, res) => {
@@ -137,8 +128,7 @@ export const solicitarReset = async (req, res) => {
   }
 };
 
-/**
- * POST /reset
+/** POST /reset
  * body: { token, password }
  */
 export const resetearPassword = async (req, res) => {

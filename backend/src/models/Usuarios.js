@@ -35,7 +35,6 @@ schema.methods.matchPassword = function (plain) {
   return bcrypt.compare(plain, this.password);
 };
 
-// (opcional) índice explícito por si migras datos
-schema.index({ email: 1 }, { unique: true });
+// ⚠️ QUITADO el schema.index duplicado
 
-export default mongoose.model('Cuentas', schema);
+export default mongoose.model('Usuarios', schema);
