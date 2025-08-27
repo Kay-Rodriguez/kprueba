@@ -1,32 +1,52 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
+// src/server.js
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import app from './index.js';
 import connection from './config/database.js';
 
+const PORT = Number(process.env.PORT ?? 3000);
+let server;
 
-import authRoutes from './routers/auth_routes.js';
-import clientesRoutes from './routers/clientes_routes.js';
-import tecnicosRoutes from './routers/tecnicos_routes.js';
-import ticketsRoutes from './routers/tickets_routes.js';
+async function start() {
+  try {
+    console.log(`🌱 Iniciando en ${process.env.NODE_ENV || 'development'}…`);
+    await connection(); // Debe lanzar si falla
+    server = app.listen(PORT, () => {
+      console.log(`✅ Backend en http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('❌ Fallo al iniciar la app:', err?.message || err);
+    process.exit(1);
+  }
+}
+start();
 
+// --- Apagado elegante ---
+async function shutdown(signal) {
+  console.log(`\n🛑 Recibido ${signal}. Cerrando con gracia...`);
+  try {
+    if (server) {
+      await new Promise((resolve) => server.close(resolve));
+    }
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+    console.log('👋 Recursos liberados. Bye!');
+    process.exit(0);
+  } catch (err) {
+    console.error('⚠️ Error al cerrar:', err);
+    process.exit(1);
+  }
+}
 
-dotenv.config();
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-
-connection();
-
-
-app.use('/api/auth', authRoutes);
-app.use('/api/clientes', clientesRoutes);
-app.use('/api/tecnicos', tecnicosRoutes);
-app.use('/api/tickets', ticketsRoutes);
-
-
-app.get('/', (_req, res) => res.send('API funcionando 🚀'));
-
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`✅ Backend en http://localhost:${PORT}`));
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('unhandledRejection', (reason) => {
+  console.error('💥 Unhandled Rejection:', reason);
+  shutdown('unhandledRejection');
+});
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err);
+  shutdown('uncaughtException');
+});
+export default server; // para tests

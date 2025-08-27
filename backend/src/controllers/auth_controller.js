@@ -1,3 +1,4 @@
+// auth_controller.js
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Usuario from '../models/Usuario.js';
