@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
-import { toJSONOpts } from './helpers.js';
 
+const toJSONOpts = {
+virtuals: true,
+versionKey: false,
+transform: (_, ret) => { ret.id = ret._id; delete ret._id; }
+};
 
 const schema = new mongoose.Schema({
 nombre: { type: String, required: true },

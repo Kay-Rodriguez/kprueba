@@ -10,9 +10,9 @@ let server;
 async function start() {
   try {
     console.log(`🌱 Iniciando en ${process.env.NODE_ENV || 'development'}…`);
-    await connection(); // Debe lanzar si falla
+    await connection(); // conecta a Mongo, lanza error si falla
     server = app.listen(PORT, () => {
-      console.log(`✅ Backend en http://localhost:${PORT}`);
+      console.log(`✅ Backend escuchando en http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error('❌ Fallo al iniciar la app:', err?.message || err);
@@ -23,7 +23,7 @@ start();
 
 // --- Apagado elegante ---
 async function shutdown(signal) {
-  console.log(`\n🛑 Recibido ${signal}. Cerrando con gracia...`);
+  console.log(`\n🛑 Señal ${signal} recibida. Cerrando con gracia...`);
   try {
     if (server) {
       await new Promise((resolve) => server.close(resolve));
@@ -49,4 +49,3 @@ process.on('uncaughtException', (err) => {
   console.error('💥 Uncaught Exception:', err);
   shutdown('uncaughtException');
 });
-export default server; // para tests

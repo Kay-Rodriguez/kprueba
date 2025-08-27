@@ -8,10 +8,9 @@ const schema = new mongoose.Schema({
   password: { type: String, required: true },
   verified: { type: Boolean, default: false },
   verificationToken: { type: String, default: null },
-  // 👇 NUEVO
   resetToken: { type: String, default: null },
   resetExpires: { type: Date, default: null },
-  rol: { type: String, enum: ["admin", "user"], default: "user" }
+  rol: { type: String, enum: ["admin", "user"], default: "user", immutable: true}
 }, { timestamps: true });
 
 // virtual id bonito

@@ -4,9 +4,9 @@
   "type": "module",
   "main": "./src/server.js",
   "scripts": {
-    "test": "vitest run --reporter=verbose",
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "vitest run --reporter=verbose"
   },
   "keywords": [],
   "author": "",

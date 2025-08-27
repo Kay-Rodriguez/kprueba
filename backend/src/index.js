@@ -13,8 +13,8 @@ const app = express();
 
 // Config desde .env con defaults sensatos
 const JSON_LIMIT = process.env.JSON_LIMIT || '2mb';
-const TRUST_PROXY = String(process.env.TRUST_PROXY ?? 'false') === 'true'; // detrás de Nginx/Proxy
-const CORS_ORIGIN = process.env.CORS_ORIGIN || true;   // origin específico o true
+const TRUST_PROXY = String(process.env.TRUST_PROXY ?? 'false') === 'true';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || true;
 const CORS_CREDENTIALS = String(process.env.CORS_CREDENTIALS ?? 'true') === 'true';
 
 // --- Middlewares base ---
@@ -23,7 +23,7 @@ app.use(cors({ origin: CORS_ORIGIN, credentials: CORS_CREDENTIALS }));
 app.use(express.json({ limit: JSON_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT }));
 
-// --- Utilidades ---
+// --- Helpers ---
 const mongoStateText = (state) =>
   (['disconnected', 'connected', 'connecting', 'disconnecting'][state] || 'unknown');
 
@@ -40,7 +40,6 @@ app.get('/health', async (_req, res) => {
     env: process.env.NODE_ENV || 'development',
   };
 
-  // Si estamos conectados, intenta ping real a MongoDB
   if (state === 1 && mongoose.connection.db?.admin) {
     try {
       const t0 = Date.now();
