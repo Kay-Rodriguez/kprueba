@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { verificarAuth } from '../middlewares/auth.js';
-import { crear, listar, obtener, actualizar, eliminar } from '../controllers/clientes.controller.js';
+import { crear, listar, obtener, actualizar, eliminar } from '../controllers/clientes_controller.js';
 const r = Router();
 
 

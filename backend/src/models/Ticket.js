@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { toJSONOpts } from './_helpers.js';
+import { toJSONOpts } from './helpers.js';
 
 
 const schema = new mongoose.Schema({
