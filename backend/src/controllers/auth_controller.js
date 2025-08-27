@@ -59,3 +59,35 @@ return res.json({ token: generarToken(user.id), user: { id: user.id, nombre: use
 return res.status(500).json({ msg: e.message });
 }
 };
+// solicitar correo de recuperación
+export const solicitarReset = async (req, res) => {
+  const { email } = req.body;
+  const user = await Usuario.findOne({ email });
+  if (!user) return res.json({ msg: 'Si el correo existe, enviaremos instrucciones.' });
+  const token = crypto.randomBytes(24).toString('hex');
+  user.resetToken = token;
+  user.resetExpires = new Date(Date.now() + 60*60*1000); // 1h
+  await user.save();
+  await sendPasswordReset(email, token);
+  res.json({ msg: 'Hemos enviado un enlace de recuperación.' });
+};
+
+// guardar nueva contraseña (10 dígitos)
+export const resetearPassword = async (req, res) => {
+  const { token, password } = req.body;
+  if (!esClaveValida(password))
+    return res.status(400).json({ msg: 'La clave debe tener exactamente 10 dígitos' });
+
+  const user = await Usuario.findOne({
+    resetToken: token,
+    resetExpires: { $gt: new Date() }
+  });
+  if (!user) return res.status(400).json({ msg: 'Token inválido o expirado' });
+
+  user.password = password;        // se hashea en pre('save')
+  user.resetToken = null;
+  user.resetExpires = null;
+  await user.save();
+
+  res.json({ msg: 'Contraseña actualizada' });
+};

@@ -1,36 +1,44 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+export default function Login(){
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('admin@demo.com');
+  const [password, setPassword] = useState('1234567890'); // 10 dígitos
+  const [error, setError] = useState('');
 
-export default function Register(){
-const { register } = useAuth();
-const [form, setForm] = useState({ nombre:'', apellido:'', email:'', password:'' });
-const [msg, setMsg] = useState('');
-const [err, setErr] = useState('');
+  const handleSubmit = async (e) => {
+    e.preventDefault(); setError('');
+    if(!/^\d{10}$/.test(password)) return setError('La clave debe tener 10 dígitos numéricos.');
+    try { await login(email, password); navigate('/dashboard'); }
+    catch(err){ setError(err?.response?.data?.msg || 'Usuario o contraseña incorrectos.'); }
+  };
 
+  return (
+    <div className="container" style={{maxWidth: 420}}>
+      <div className="card">
+        <h2>Iniciar sesión</h2>
+        <form onSubmit={handleSubmit} className="grid">
+          <div>
+            <label>Email</label>
+            <input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="tu@email.com" />
+          </div>
+          <div>
+            <label>Clave (10 dígitos)</label>
+            <input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="1234567890" maxLength={10} />
+          </div>
+          {error && <div style={{color:'#f87171'}}>{error}</div>}
+          <button className="btn" type="submit">Ingresar</button>
 
-const submit = async (e) => {
-e.preventDefault(); setErr(''); setMsg('');
-if(!/^\d{10}$/.test(form.password)) return setErr('La clave debe tener 10 dígitos numéricos.');
-try { const r = await register(form); setMsg(r.msg || 'Revisa tu correo para confirmar.'); }
-catch(e){ setErr(e?.response?.data?.msg || 'Error al registrar'); }
-};
-
-
-return (
-<div className="container" style={{maxWidth: 520}}>
-<div className="card">
-<h2>Crear cuenta</h2>
-<form onSubmit={submit} className="grid">
-<input placeholder="Nombre" value={form.nombre} onChange={e=>setForm({...form, nombre:e.target.value})} />
-<input placeholder="Apellido" value={form.apellido} onChange={e=>setForm({...form, apellido:e.target.value})} />
-<input type="email" placeholder="Email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} />
-<input type="password" placeholder="Clave (10 dígitos)" maxLength={10} value={form.password} onChange={e=>setForm({...form, password:e.target.value})} />
-<button className="btn" type="submit">Registrarme</button>
-{msg && <div style={{color:'#16a34a'}}>{msg}</div>}
-{err && <div style={{color:'#dc2626'}}>{err}</div>}
-</form>
-</div>
-</div>
-);
+          {/* botones extra */}
+          <div className="flex" style={{justifyContent:'space-between'}}>
+            <Link to="/register" className="btn secondary">Crear cuenta</Link>
+            <Link to="/forgot" className="btn secondary">¿Olvidaste tu contraseña?</Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }

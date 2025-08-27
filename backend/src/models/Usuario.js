@@ -1,7 +1,5 @@
-// src/models/Usuario.js
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { toJSONOpts } from './helpers.js';
 
 const schema = new mongoose.Schema({
   nombre: { type: String, required: true, trim: true },
@@ -10,12 +8,19 @@ const schema = new mongoose.Schema({
   password: { type: String, required: true },
   verified: { type: Boolean, default: false },
   verificationToken: { type: String, default: null },
-  rol: { type: String, enum: ['admin', 'user'], default: 'user' }
+  // 👇 NUEVO
+  resetToken: { type: String, default: null },
+  resetExpires: { type: Date, default: null },
+  rol: { type: String, enum: ["admin", "user"], default: "user" }
 }, { timestamps: true });
 
-schema.set('toJSON', toJSONOpts);
+// virtual id bonito
+schema.set('toJSON', {
+  virtuals: true, versionKey: false,
+  transform: (_d, ret) => { ret.id = ret._id; delete ret._id; }
+});
 
-schema.pre('save', async function (next) {
+schema.pre('save', async function(next){
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

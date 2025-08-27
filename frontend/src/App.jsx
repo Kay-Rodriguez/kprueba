@@ -9,7 +9,8 @@ import Dashboard from './pages/Dashboard';
 import TechniciansPage from './pages/TechniciansPage';
 import ClientsPage from './pages/ClientsPage';
 import TicketsPage from './pages/TicketsPage';
-
+ import Forgot from './pages/Forgot';   // 👈 NUEVO
+import Reset from './pages/Reset';  
 
 function Layout({ children }){
 const { logout } = useAuth();
@@ -44,6 +45,9 @@ return (
 <Route path="/login" element={<Login/>} />
 <Route path="/register" element={<Register/>} />
 <Route path="/confirm/:token" element={<Confirm/>} />
+
+<Route path="/forgot" element={<Forgot />} />
+<Route path="/reset/:token" element={<Reset />} />
 <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard/></Layout></ProtectedRoute>} />
 <Route path="/technicians" element={<ProtectedRoute><Layout><TechniciansPage/></Layout></ProtectedRoute>} />
 <Route path="/clients" element={<ProtectedRoute><Layout><ClientsPage/></Layout></ProtectedRoute>} />

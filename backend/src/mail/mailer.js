@@ -31,3 +31,14 @@ html: `<h2>Confirma tu cuenta</h2>
 <p>Si no creaste esta cuenta, ignora este mensaje.</p>`
 });
 };
+//  correo de recuperación
+export const sendPasswordReset = async (email, token) => {
+  const url = `${process.env.URL_FRONTEND}reset/${token}`;
+  return sendMail({
+    to: email,
+    subject: "prueba – Recuperar contraseña",
+    html: `<h2>Recupera tu acceso</h2>
+      <p>Usa este enlace para crear una nueva contraseña (10 dígitos):</p>
+      <p><a href="${url}">${url}</a></p>`
+  });
+};

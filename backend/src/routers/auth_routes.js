@@ -8,5 +8,6 @@ r.post('/register', registro);
 r.post('/login', login);
 r.get('/confirm/:token', confirmar);
 
-
-export default r;
+r.post('/forgot', solicitarReset);
+r.post('/reset', resetearPassword);
+export default r; 
