@@ -1,4 +1,4 @@
-import Cliente from '../models/Cliente.js';
+import Cliente from '../models/Clientes.js';
 
 
 export const crear = async (req, res) => {

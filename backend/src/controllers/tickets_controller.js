@@ -1,4 +1,4 @@
-import Ticket from '../models/Ticket.js';
+import Ticket from '../models/Tickets.js';
 
 
 export const crear = async (req, res) => {

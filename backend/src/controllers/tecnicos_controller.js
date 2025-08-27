@@ -1,4 +1,4 @@
-import Tecnico from '../models/Tecnico.js';
+import Tecnico from '../models/Tecnicos.js';
 
 
 export const crear = async (req, res) => {

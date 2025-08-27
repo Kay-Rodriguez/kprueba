@@ -4,13 +4,22 @@ import mongoose from 'mongoose';
 import app from './index.js';
 import connection from './config/database.js';
 
+function assertEnv(name) {
+  const v = process.env[name];
+  if (!v || !String(v).trim()) {
+    console.warn(`⚠️  Falta variable ${name} en .env`);
+  }
+}
+
+['MONGO_URI', 'MONGO_DB_NAME', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'URL_FRONTEND'].forEach(assertEnv);
+
 const PORT = Number(process.env.PORT ?? 3000);
 let server;
 
 async function start() {
   try {
     console.log(`🌱 Iniciando en ${process.env.NODE_ENV || 'development'}…`);
-    await connection(); // conecta a Mongo, lanza error si falla
+    await connection(); // conecta a Mongo
     server = app.listen(PORT, () => {
       console.log(`✅ Backend escuchando en http://localhost:${PORT}`);
     });
@@ -25,12 +34,8 @@ start();
 async function shutdown(signal) {
   console.log(`\n🛑 Señal ${signal} recibida. Cerrando con gracia...`);
   try {
-    if (server) {
-      await new Promise((resolve) => server.close(resolve));
-    }
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
+    if (server) await new Promise((resolve) => server.close(resolve));
+    if (mongoose.connection.readyState !== 0) await mongoose.disconnect();
     console.log('👋 Recursos liberados. Bye!');
     process.exit(0);
   } catch (err) {
