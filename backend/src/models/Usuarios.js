@@ -35,6 +35,4 @@ schema.methods.matchPassword = function (plain) {
   return bcrypt.compare(plain, this.password);
 };
 
-// ⚠️ QUITADO el schema.index duplicado
-
 export default mongoose.model('Usuarios', schema);
