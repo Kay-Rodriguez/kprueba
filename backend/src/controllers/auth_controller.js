@@ -2,28 +2,45 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Usuario from '../models/Cuentas.js';
-import { sendVerification, sendPasswordReset } from '../mail/mailer.js'; // 👈 AÑADIDO
+import { sendVerification, sendPasswordReset } from '../mail/mailer.js';
 
 const generarToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES });
 
 const esClaveValida = (pwd) => /^[0-9]{10}$/.test(pwd);
+const normalizaEmail = (s = '') => String(s).trim().toLowerCase();
+const limpia = (s = '') => String(s).trim();
 
+/** POST /register
+ * body: { nombre, apellido, email, password }
+ */
 export const registro = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
-    if (!nombre || !apellido || !email || !password)
-      return res.status(400).json({ msg: 'Faltan datos' });
-    if (!esClaveValida(password))
+    const nombre   = limpia(req.body?.nombre);
+    const apellido = limpia(req.body?.apellido);
+    const email    = normalizaEmail(req.body?.email);
+    const { password } = req.body || {};
+
+    if (!nombre || !apellido || !email || !password) {
+      return res.status(400).json({ msg: 'Faltan datos: nombre, apellido, email y password son requeridos' });
+    }
+
+    if (!esClaveValida(password)) {
       return res.status(400).json({ msg: 'La clave debe tener exactamente 10 dígitos numéricos' });
+    }
 
     const existe = await Usuario.findOne({ email });
     if (existe) return res.status(400).json({ msg: 'El usuario ya existe' });
 
     const verificationToken = crypto.randomBytes(24).toString('hex');
+
     const user = await Usuario.create({
-      nombre, apellido, email, password,
-      verificationToken, verified: false
+      nombre,
+      apellido,
+      email,
+      password,
+      verified: false,
+      verificationToken
     });
 
     await sendVerification(user.email, verificationToken);
@@ -33,23 +50,14 @@ export const registro = async (req, res) => {
   }
 };
 
-export const confirmar = async (req, res) => {
-  try {
-    const { token } = req.params;
-    const user = await Usuario.findOne({ verificationToken: token });
-    if (!user) return res.status(400).json({ msg: 'Token inválido o expirado' });
-    user.verified = true;
-    user.verificationToken = null;
-    await user.save();
-    return res.json({ msg: 'Cuenta verificada correctamente' });
-  } catch (e) {
-    return res.status(500).json({ msg: e.message });
-  }
-};
-
+/** POST /login
+ * body: { email, password }
+ */
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizaEmail(req.body?.email);
+    const { password } = req.body || {};
+
     const user = await Usuario.findOne({ email });
     if (!user) return res.status(400).json({ msg: 'Usuario o contraseña incorrectos' });
     if (!user.verified) return res.status(403).json({ msg: 'Debe confirmar su correo antes de iniciar sesión' });
@@ -59,20 +67,62 @@ export const login = async (req, res) => {
 
     return res.json({
       token: generarToken(user.id),
-      user: { id: user.id, nombre: user.nombre, apellido: user.apellido, email: user.email }
+      user: {
+        id: user.id,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
+        rol: user.rol
+      }
     });
   } catch (e) {
     return res.status(500).json({ msg: e.message });
   }
 };
 
+
+/**
+ * GET /confirm/:token
+ */
+export const confirmar = async (req, res) => {
+  try {
+    const { token } = req.params;
+    console.log('[confirmar] hit con token:', token);
+
+    const user = await Usuario.findOne({ verificationToken: token });
+
+    if (user) {
+      console.log('[confirmar] usuario encontrado:', { id: user.id, verified: user.verified });
+      if (!user.verified) {
+        user.verified = true;
+        user.verificationToken = null;
+        await user.save();
+        console.log('[confirmar] token consumido y verificado');
+      } else {
+        console.log('[confirmar] ya estaba verificado');
+      }
+      return res.json({ msg: 'Cuenta verificada correctamente' });
+    }
+
+    console.log('[confirmar] token no encontrado (posible 2da llamada)');
+    return res.status(200).json({ msg: 'El enlace ya fue utilizado o la cuenta ya está confirmada.' });
+  } catch (e) {
+    console.error('[confirmar] error:', e);
+    return res.status(500).json({ msg: e.message });
+  }
+};
+
+/**
+ * POST /forgot
+ * body: { email }
+ */
 export const solicitarReset = async (req, res) => {
   try {
-    const { email } = req.body || {};
+    const email = normalizaEmail(req.body?.email);
     if (!email) return res.status(400).json({ msg: 'email requerido' });
 
     const user = await Usuario.findOne({ email });
-    // Respuesta genérica para no filtrar existencia de cuentas
+    // respuesta genérica para no filtrar existencia
     if (!user) return res.json({ msg: 'Si el correo existe, enviaremos instrucciones.' });
 
     const token = crypto.randomBytes(24).toString('hex');
@@ -87,6 +137,10 @@ export const solicitarReset = async (req, res) => {
   }
 };
 
+/**
+ * POST /reset
+ * body: { token, password }
+ */
 export const resetearPassword = async (req, res) => {
   try {
     const { token, password } = req.body || {};

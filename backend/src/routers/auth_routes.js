@@ -4,8 +4,8 @@ import {
   login,
   registro,
   confirmar,
-  solicitarReset,     // 👈 importa esto
-  resetearPassword    // 👈 y esto
+  solicitarReset,
+  resetearPassword
 } from '../controllers/auth_controller.js';
 
 const r = Router();

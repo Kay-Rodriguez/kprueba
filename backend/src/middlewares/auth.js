@@ -1,5 +1,5 @@
+// middlewares/auth.js
 import jwt from 'jsonwebtoken';
-
 
 export const verificarAuth = (req, res, next) => {
     const token = (req.headers.authorization || '').replace('Bearer ', '');
