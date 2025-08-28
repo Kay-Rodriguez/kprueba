@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: fin-de-carrera
+    env: node
+    rootDir: . 
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+ 

@@ -26,8 +26,8 @@ export default function Login() {
       await login(email.trim(), password);
       navigate('/dashboard');
     } catch (err) {
-      const msg = err?.data?.error || err?.data?.message || err?.message || 'Usuario o contraseña incorrectos.';
-      setError(msg);
+      console.error('LOGIN ERROR:', err);
+  setError(err?.message || 'Usuario o contraseña incorrectos.');
     } finally {
       setSubmitting(false);
     }

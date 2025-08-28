@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const [user, setUser]   = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper para actualizar token de manera centralizada
+
   const setAuthToken = useCallback((newToken) => {
     if (newToken) {
       localStorage.setItem('token', newToken);
@@ -30,8 +30,6 @@ export function AuthProvider({ children }) {
       setToken(null);
     }
   }, []);
-
-  // Hidratación inicial: si hay token intenta obtener /auth/me
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -40,20 +38,24 @@ export function AuthProvider({ children }) {
           setUser(null);
           return;
         }
-        const { data } = await api.get('/auth/me'); // el interceptor ya adjunta Authorization desde localStorage
+        const { data } = await api.get('/auth/me');
         if (alive) setUser(data?.user ?? null);
       } catch {
-        // token inválido/expirado
-        if (alive) {
-          setUser(null);
-          setAuthToken(null);
-        }
+       if (alive) {
+         setUser(null);
+         setAuthToken(null);
+       }
+       if (alive) {
+         
+         setUser(null);
+       }
       } finally {
         if (alive) setLoading(false);
       }
     })();
     return () => { alive = false; };
   }, [token, setAuthToken]);
+
 
   // Sincroniza sesión entre pestañas
   useEffect(() => {
@@ -100,8 +102,8 @@ export function AuthProvider({ children }) {
     reset,
     login,
     logout,
-    setUser,      // opcional, por si quieres actualizar perfil
-    setAuthToken, // opcional, por si renuevas token
+    setUser,      
+    setAuthToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

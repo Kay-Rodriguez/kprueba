@@ -1,37 +1,58 @@
 import axios from 'axios';
 
 const RAW = import.meta.env.VITE_API_URL || 'https://gestion-tickets-api.onrender.com/api';
-const API_BASE = RAW.trim().split(',')[0].replace(/\/$/, ''); 
+const API_BASE = RAW.trim().split(',')[0].replace(/\/$/, '');
 
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 15000,
-  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// ➜ añade token en cada request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-
+// ➜ convierte cualquier error en un Error con .message legible
 api.interceptors.response.use(
   (res) => res,
-  (error) => {
-    const status = error?.response?.status;
-    const data = error?.response?.data;
-    const message =
-      data?.msg || data?.error || data?.message || error.message || 'Request failed';
+  async (error) => {
+    const r = error?.response;
+    let message = 'Request failed';
+
+    if (!r) {
+      message = 'No se pudo conectar con el servidor (red o CORS).';
+    } else {
+      let d = r.data;
+
+      // Si viene como Blob (pasa a veces en 4xx/5xx), intenta leerlo como texto
+      if (d instanceof Blob) {
+        try { d = JSON.parse(await d.text()); }
+        catch { d = await d.text(); }
+      }
+
+      if (typeof d === 'string' && d.trim()) {
+        message = d.trim(); // texto/HTML plano
+      } else if (d?.msg) {
+        message = d.msg;
+      } else if (d?.error) {
+        message = d.error;
+      } else if (d?.message) {
+        message = d.message;
+      } else {
+        message = `Error ${r.status}`;
+      }
+    }
+
     const err = new Error(message);
-    err.status = status;
-    err.data = data;
+    err.status = r?.status;
+    err.data = r?.data;
     return Promise.reject(err);
   }
 );
