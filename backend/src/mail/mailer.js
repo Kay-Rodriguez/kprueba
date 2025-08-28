@@ -32,7 +32,6 @@ if (!isProd) {
 // ---------- helpers ----------
 const fromAddress = process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@example.com';
 
-// Une base + path sin dobles barras ni pérdidas de slash
 const joinUrl = (base = '', path = '') => {
   const b = String(base).trim();
   const p = String(path).trim();
@@ -40,22 +39,19 @@ const joinUrl = (base = '', path = '') => {
   return `${b.replace(/\/+$/, '')}/${p.replace(/^\/+/, '')}`;
 };
 
-// Construye URL para confirmación apuntando al FRONT si existe,
-// y si no, hace fallback al endpoint directo del BACK.
 const buildConfirmUrl = (token) => {
-  const front = process.env.URL_FRONTEND;     // ej: https://kprueba.vercel.app
-  const back  = process.env.URL_BACKEND;      // ej: https://gestion-tickets-api.onrender.com/
-  if (front) return joinUrl(front, `confirm/${token}`);
-  if (back)  return joinUrl(back, `api/auth/confirm/${token}`);
-  // último recurso (local)
+  const front = process.env.URL_FRONTEND; // <-- ahora termina en "#/"
+  const back = process.env.URL_BACKEND;
+  if (front) return joinUrl(front, `confirm/${token}`);        // https://kprueba.vercel.app/#/confirm/XYZ
+  if (back) return joinUrl(back, `api/auth/confirm/${token}`); // fallback directo al backend
   return `/api/auth/confirm/${token}`;
 };
 
 const buildResetUrl = (token) => {
   const front = process.env.URL_FRONTEND;
-  const back  = process.env.URL_BACKEND;
-  if (front) return joinUrl(front, `reset/${token}`);
-  if (back)  return joinUrl(back, `api/auth/reset/${token}`);
+  const back = process.env.URL_BACKEND;
+  if (front) return joinUrl(front, `reset/${token}`);           // https://kprueba.vercel.app/#/reset/XYZ
+  if (back) return joinUrl(back, `api/auth/reset/${token}`);
   return `/api/auth/reset/${token}`;
 };
 

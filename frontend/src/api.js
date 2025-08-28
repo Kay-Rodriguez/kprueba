@@ -1,8 +1,9 @@
 // src/api.js
+// src/api.js
 import axios from 'axios';
 
-
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://gestion-tickets-api.onrender.com/api')
+  .replace(/\/$/, '');
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -11,9 +12,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-
 });
-
 
 api.interceptors.request.use(
   (config) => {
@@ -44,7 +43,6 @@ api.interceptors.response.use(
 
 export default api;
 
-// 
 export const setAuthToken = (token) => {
   if (token) localStorage.setItem('token', token);
   else localStorage.removeItem('token');
