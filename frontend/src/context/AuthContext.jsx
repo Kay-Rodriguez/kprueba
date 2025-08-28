@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const [user, setUser]   = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper para actualizar token de manera centralizada
+
   const setAuthToken = useCallback((newToken) => {
     if (newToken) {
       localStorage.setItem('token', newToken);
@@ -46,7 +46,7 @@ export function AuthProvider({ children }) {
          setAuthToken(null);
        }
        if (alive) {
-         // No limpies el token aquí: evita "se abre y se cierra"
+         
          setUser(null);
        }
       } finally {
@@ -102,8 +102,8 @@ export function AuthProvider({ children }) {
     reset,
     login,
     logout,
-    setUser,      // opcional, por si quieres actualizar perfil
-    setAuthToken, // opcional, por si renuevas token
+    setUser,      
+    setAuthToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
