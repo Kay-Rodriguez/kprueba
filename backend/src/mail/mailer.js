@@ -14,15 +14,10 @@ const transporter = nodemailer.createTransport({
   pool: true,
   maxConnections: 3,
   maxMessages: 100,
-  // Útil en entornos con proxies/IPv6 raros; puedes quitar si no lo necesitas
-  tls: {
-    // servername: process.env.SMTP_HOST, // opcional
-    // rejectUnauthorized: true,         // por defecto true
-  },
   logger: !isProd
 });
 
-// Verificación del transporte solo en desarrollo (evita ruido en producción)
+// Verificación del transporte solo en desarrollo
 if (!isProd) {
   transporter.verify()
     .then(() => console.log('📮 SMTP listo para enviar'))
@@ -40,18 +35,18 @@ const joinUrl = (base = '', path = '') => {
 };
 
 const buildConfirmUrl = (token) => {
-  const front = process.env.URL_FRONTEND; // <-- ahora termina en "#/"
-  const back = process.env.URL_BACKEND;
-  if (front) return joinUrl(front, `confirm/${token}`);        // https://kprueba.vercel.app/#/confirm/XYZ
-  if (back) return joinUrl(back, `api/auth/confirm/${token}`); // fallback directo al backend
+  const front = process.env.URL_FRONTEND; // https://kprueba.vercel.app
+  const back  = process.env.URL_BACKEND;  // https://gestion-tickets-api.onrender.com
+  if (front) return joinUrl(front, `confirm/${token}`);
+  if (back)  return joinUrl(back, `api/auth/confirm/${token}`);
   return `/api/auth/confirm/${token}`;
 };
 
 const buildResetUrl = (token) => {
   const front = process.env.URL_FRONTEND;
-  const back = process.env.URL_BACKEND;
-  if (front) return joinUrl(front, `reset/${token}`);           // https://kprueba.vercel.app/#/reset/XYZ
-  if (back) return joinUrl(back, `api/auth/reset/${token}`);
+  const back  = process.env.URL_BACKEND;
+  if (front) return joinUrl(front, `reset/${token}`);
+  if (back)  return joinUrl(back, `api/auth/reset/${token}`);
   return `/api/auth/reset/${token}`;
 };
 
@@ -67,7 +62,6 @@ export const sendMail = async ({ to, subject, html, text }) => {
     });
     return info.messageId;
   } catch (err) {
-    // Log limpio y rethrow para que el caller decida qué hacer
     console.error('✉️  Error enviando correo:', err?.message || err);
     throw err;
   }
