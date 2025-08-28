@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard';
 import TechniciansPage from './pages/TechniciansPage';
 import ClientsPage from './pages/ClientsPage';
 import TicketsPage from './pages/TicketsPage';
- import Forgot from './pages/Forgot';   // 👈 NUEVO
+ import Forgot from './pages/Forgot';
 import Reset from './pages/Reset';  
 
 function Layout({ children }){

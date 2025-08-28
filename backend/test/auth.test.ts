@@ -10,7 +10,7 @@ vi.mock('../src/mail/mailer.js', () => ({
 
 import app from '../src/index.js';
 import connection from '../src/config/database.js';
-import Usuario from '../src/models/Usuario.js';
+import Usuario from '../src/models/Usuarios.js';
 import { setupTestDB } from './setup.js';
 
 let testDb: Awaited<ReturnType<typeof setupTestDB>>;
