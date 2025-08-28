@@ -78,15 +78,13 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    // Ajusta si tu backend devuelve otros campos:
-    // data = { token, user }
+    
     setAuthToken(data.token);
     setUser(data.user ?? null);
     return data.user ?? null;
   };
 
   const logout = async () => {
-    // Si tienes endpoint: await api.post('/auth/logout').catch(()=>{});
     setUser(null);
     setAuthToken(null);
   };

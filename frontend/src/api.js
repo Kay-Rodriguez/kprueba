@@ -1,35 +1,24 @@
-// src/api.js
-// src/api.js
 import axios from 'axios';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'https://gestion-tickets-api.onrender.com/api')
-  .replace(/\/$/, '');
+const RAW = import.meta.env.VITE_API_URL || 'https://gestion-tickets-api.onrender.com/api';
+const API_BASE = RAW.trim().split(',')[0].replace(/\/$/, ''); 
 
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 });
 
-api.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    const status = error?.response?.status;
-    const data = error?.response?.data;
-    const message =
-      data?.msg ||               
-      data?.error ||
-      data?.message ||
-      error.message ||
-      'Request failed';
-    const err = new Error(message);
-    err.status = status;
-    err.data = data;
-    return Promise.reject(err);
-  }
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
 
@@ -38,7 +27,8 @@ api.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
     const data = error?.response?.data;
-    const message = data?.error || data?.message || error.message || 'Request failed';
+    const message =
+      data?.msg || data?.error || data?.message || error.message || 'Request failed';
     const err = new Error(message);
     err.status = status;
     err.data = data;

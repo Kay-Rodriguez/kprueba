@@ -79,6 +79,13 @@ export const login = async (req, res) => {
     return res.status(500).json({ msg: e.message });
   }
 };
+///////////////////////////////////
+export const me = async (req, res) => {
+  const user = await Usuario.findById(req.userId).select('-password');
+  if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+  res.json({ user });
+};
+
 
 /** GET /confirm/:token  — idempotente */
 export const confirmar = async (req, res) => {
