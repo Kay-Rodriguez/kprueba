@@ -11,7 +11,6 @@ const schema = new mongoose.Schema({
   codigo: { type: String, required: true, unique: true },
   descripcion: String,
 
-  // usa los nombres EXACTOS con los que exportaste los modelos
   id_tecnico: { type: mongoose.Schema.Types.ObjectId, ref: 'Tecnicos', required: true },
   id_cliente: { type: mongoose.Schema.Types.ObjectId, ref: 'Clientes', required: true },
 

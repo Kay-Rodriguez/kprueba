@@ -1,9 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
-import type * as express from 'express';   // ✅ namespace, no named export
-
-// 👇 Mock simple, sin usar vi.fn (evita problemas de hoisting)
+import type * as express from 'express';   
 vi.mock('../src/mail/mailer.js', () => ({
   sendVerification: async () => 'mock-message-id'
 }));

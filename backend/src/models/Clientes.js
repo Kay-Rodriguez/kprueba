@@ -7,14 +7,12 @@ const toJSONOpts = {
     transform: (_d, ret) => { ret.id = ret._id; delete ret._id; }
 };
 
-// helper: convierte "" en undefined
 const emptyToUndef = v => (typeof v === 'string' && v.trim() === '' ? undefined : v);
 
 const schema = new mongoose.Schema({
     nombre: { type: String, required: true, trim: true, set: emptyToUndef },
     apellido: { type: String, trim: true, set: emptyToUndef },
 
-    // ECU: 10 dígitos. Marca único.
     cedula: {
         type: String,
         required: true,
@@ -45,7 +43,7 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        // permite + prefijo o solo dígitos (ajústalo si quieres)
+        
         match: [/^\+?\d{7,15}$/, 'Teléfono inválido'],
         set: v => (v ? String(v).trim() : v)
     },
@@ -55,13 +53,11 @@ const schema = new mongoose.Schema({
         required: true
     },
 
-    // área/departamento del cliente dentro de la organización
     dependencia: { type: String, required: true, trim: true, set: emptyToUndef }
 
 }, { timestamps: true });
 
-// índice compuesto útil para búsquedas (opcional)
-// schema.index({ dependencia: 1, ciudad: 1 });
+
 
 schema.set('toJSON', toJSONOpts);
 

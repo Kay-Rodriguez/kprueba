@@ -48,13 +48,11 @@ const matchesWildcard = (origin) => {
 app.disable('x-powered-by');
 if (TRUST_PROXY) app.set('trust proxy', 1);
 
-// Evita caches erróneos por Origin/Headers variables
 app.use((req, res, next) => {
   res.setHeader('Vary', 'Origin, Access-Control-Request-Headers, Access-Control-Request-Method');
   next();
 });
 
-// CORS centralizado (NO setear A-C-A-O en otro sitio)
 const corsOptions = {
   origin(origin, cb) {
     if (!origin) return ALLOW_NULL_ORIGIN ? cb(null, true) : cb(new Error('Origen nulo no permitido por CORS'));
@@ -77,26 +75,21 @@ const corsOptions = {
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Content-Disposition'],
-  // Importante: dejamos que cors responda el preflight (204) y NO duplicamos headers
+
   optionsSuccessStatus: 204,
   preflightContinue: false
 };
 
 app.use(cors(corsOptions));
-// ❌ NO agregar app.options('*', cors(...)) para evitar duplicado de A-C-A-O
 
-/* ---------------------- Parsers ---------------------- */
 app.use(express.json({ limit: JSON_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT }));
 
-/* ---------------------- Helpers ---------------------- */
 const mongoStateText = (state) =>
   (['disconnected', 'connected', 'connecting', 'disconnecting'][state] || 'unknown');
 
-/* ---------------------- Rutas públicas ---------------------- */
 app.get('/', (_req, res) => res.send('API funcionando 🚀'));
 
-// Silencia 404 del favicon en navegadores
 app.get('/favicon.ico', (_req, res) => res.status(204).end());
 
 app.get('/health', async (_req, res) => {
@@ -121,7 +114,6 @@ app.get('/health', async (_req, res) => {
   res.status(payload.ok ? 200 : 503).json(payload);
 });
 
-// Duplicado útil bajo /api para que el front lo consuma con la misma base URL
 app.get('/api/health', async (_req, res) => {
   const state = mongoose.connection.readyState;
   res.json({
@@ -139,7 +131,7 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/tecnicos', tecnicosRoutes);
 app.use('/api/tickets', ticketsRoutes);
 
-/* ---------------------- 404 y errores ---------------------- */
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Recurso no encontrado', path: req.originalUrl });
 });

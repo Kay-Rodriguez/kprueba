@@ -1,8 +1,7 @@
 // src/api.js
 import axios from 'axios';
 
-// Recomendado: en Vercel usar VITE_API_URL=https://gestion-tickets-api.onrender.com/api
-// (incluye /api). En local: http://localhost:3000/api
+
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
 
 const api = axios.create({
@@ -12,11 +11,10 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  // Si usas cookies/sesiones, habilita esto y pon VITE_WITH_CREDENTIALS=true
-  // withCredentials: import.meta.env.VITE_WITH_CREDENTIALS === 'true',
+
 });
 
-// Adjunta token si existe (sin sobrescribir si ya viene uno)
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -31,7 +29,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Normaliza errores (propaga message, status y data)
 api.interceptors.response.use(
   (res) => res,
   (error) => {
@@ -47,7 +44,7 @@ api.interceptors.response.use(
 
 export default api;
 
-// Helpers opcionales por si te sirven
+// 
 export const setAuthToken = (token) => {
   if (token) localStorage.setItem('token', token);
   else localStorage.removeItem('token');

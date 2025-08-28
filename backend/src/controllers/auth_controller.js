@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-// ⚠️ Asegúrate que este import coincida con tu archivo/modelo real
-// Si tu modelo está en Cuentas.js usa:  import Usuario from '../models/Cuentas.js';
+
 import Usuario from '../models/Usuarios.js';
 import { sendVerification, sendPasswordReset } from '../mail/mailer.js';
 
@@ -90,14 +89,13 @@ export const confirmar = async (req, res) => {
     if (user) {
       if (!user.verified) {
         user.verified = true;
-        user.verificationToken = null; // consumir token
+        user.verificationToken = null; 
         await user.save();
       }
-      // 200 siempre para evitar “falso error” si hay doble llamada
       return res.json({ msg: 'Cuenta verificada correctamente' });
     }
 
-    // Token inexistente/ya usado → mensaje neutro
+    // Token inexistente
     return res.status(200).json({ msg: 'El enlace ya fue utilizado o la cuenta ya está confirmada.' });
   } catch (e) {
     return res.status(500).json({ msg: e.message });

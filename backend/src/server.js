@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import app from './index.js';
 import connection from './config/database.js';
 
-// --- Helpers ----------------------------------------------------
+// ------------------------------------------------------
 function assertEnv(name, { required = false } = {}) {
   const v = process.env[name];
   if (!v || !String(v).trim()) {
@@ -24,15 +24,17 @@ assertEnv('JWT_SECRET', { required: true });
 // Ajustes Mongoose por entorno
 mongoose.set('strictQuery', true);
 if (process.env.NODE_ENV === 'production') {
-  mongoose.set('autoIndex', false); // recomendado en prod
+  mongoose.set('autoIndex', false); 
 }
+const allowed = (process.env.CORS_ORIGIN || process.env.URL_FRONTEND || 'http://localhost:5173').split(',');
+app.use(cors({ origin: allowed, methods: ['GET','POST','PUT','DELETE','OPTIONS'] }));
 
 // --- Config de servidor ----------------------------------------
 const PORT = Number(process.env.PORT ?? 3000);
-const HOST = '0.0.0.0'; // escucha en todas las interfaces (necesario en PaaS)
+const HOST = '0.0.0.0'; 
 let server;
 
-// Endpoint simple de salud (útil para probes de la PaaS)
+// 
 app.get('/health', (_req, res) => {
   const s = ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState] || 'unknown';
   res.json({ status: 'ok', env: process.env.NODE_ENV || 'development', mongo: s, uptime: process.uptime() });
@@ -41,7 +43,7 @@ app.get('/health', (_req, res) => {
 async function start() {
   try {
     console.log(`🌱 Iniciando en ${process.env.NODE_ENV || 'development'}…`);
-    await connection(); // conecta a Mongo (lanza si falla)
+    await connection(); 
 
     server = app.listen(PORT, HOST, () => {
       const hostShown = HOST === '0.0.0.0' ? 'localhost' : HOST;
@@ -55,16 +57,16 @@ async function start() {
 
 start();
 
-// --- Apagado elegante ------------------------------------------
+// ---------------------------------------------
 async function shutdown(signal) {
-  console.log(`\n🛑 Señal ${signal} recibida. Cerrando con gracia...`);
+  console.log(`\n Señal ${signal} recibida. Cerrando con gracia...`);
   try {
     if (server) await new Promise((resolve) => server.close(resolve));
     if (mongoose.connection.readyState !== 0) await mongoose.disconnect();
-    console.log('👋 Recursos liberados. Bye!');
+    console.log('👋 Recursos liberadoS!');
     process.exit(0);
   } catch (err) {
-    console.error('⚠️ Error al cerrar:', err);
+    console.error('¡ Error al cerrar:', err);
     process.exit(1);
   }
 }
@@ -73,10 +75,10 @@ process.on('SIGINT',    () => shutdown('SIGINT'));
 process.on('SIGTERM',   () => shutdown('SIGTERM'));
 process.on('SIGUSR2',   () => shutdown('SIGUSR2')); // nodemon
 process.on('unhandledRejection', (reason) => {
-  console.error('💥 Unhandled Rejection:', reason);
+  console.error('Unhandled Rejection:', reason);
   shutdown('unhandledRejection');
 });
 process.on('uncaughtException', (err) => {
-  console.error('💥 Uncaught Exception:', err);
+  console.error(' Uncaught Exception:', err);
   shutdown('uncaughtException');
 });

@@ -14,13 +14,12 @@ const schema = new mongoose.Schema({
   rol: { type: String, enum: ['admin', 'user'], default: 'user', immutable: true }
 }, { timestamps: true });
 
-// virtual id bonito
+
 schema.set('toJSON', {
   virtuals: true, versionKey: false,
   transform: (_d, ret) => { ret.id = ret._id; delete ret._id; }
 });
 
-// Hash de password
 schema.pre('save', async function(next){
   if (this.isModified('email')) {
     this.email = String(this.email || '').trim().toLowerCase();
