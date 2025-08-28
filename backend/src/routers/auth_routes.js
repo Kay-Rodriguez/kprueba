@@ -5,7 +5,8 @@ import {
   registro,
   confirmar,
   solicitarReset,
-  resetearPassword
+  resetearPassword,
+  me
 } from '../controllers/auth_controller.js';
 import { auth } from '../middlewares/auth.js';
 
