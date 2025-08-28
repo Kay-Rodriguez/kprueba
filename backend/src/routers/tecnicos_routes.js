@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { verificarAuth } from '../middlewares/auth.js';
+import { auth } from '../middlewares/auth.js';
 import { crear, listar, obtener, actualizar, eliminar } from '../controllers/tecnicos_controller.js';
 const r = Router();
 
 
-r.use(verificarAuth);
+r.use(auth);
 r.post('/', crear);
 r.get('/', listar);
 r.get('/:id', obtener);
