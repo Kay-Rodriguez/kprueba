@@ -7,12 +7,11 @@
 * {
     box-sizing: border-box;
 }
-
-body {
-    margin: 0;
-    font-family: ui-sans-serif, system-ui, Segoe UI, Roboto;
-    background: #eef2f7;
-    color: var(--c);
+body{
+margin:0;
+font-family:ui-sans-serif,system-ui,Segoe UI,Roboto;
+background: url('https://primeraplana.com.ec/wp-content/uploads/2023/06/WhatsApp-Image-2023-06-27-at-10.15.42-PM.jpeg') no-repeat center/cover fixed;
+color:var(--c);
 }
 
 .badge {

@@ -18,7 +18,7 @@ return (
 <div className="container">
 <div className="card" style={{marginTop:20}}>
 <div className="flex" style={{justifyContent:'space-between',alignItems:'center'}}>
-<div><b>Helpdesk</b></div>
+<div><b>caso de estudio 5</b></div>
 <div className="nav">
 <Link to="/dashboard">Inicio</Link>
 <Link to="/technicians">Técnicos</Link>
@@ -31,7 +31,7 @@ return (
 <div style={{height:16}}/>
 {children}
 <div style={{height:24}}/>
-<div className="card"><small>© 2025 Helpdesk. Demo académica.</small></div>
+<div className="card"><small>© 2025 prueba de fin de carrera Karla Rodriguez e Isaac Quinapallo.</small></div>
 </div>
 );
 }
