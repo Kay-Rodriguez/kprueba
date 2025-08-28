@@ -14,19 +14,24 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers = config.headers ?? {};
-      if (!config.headers.Authorization) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    const status = error?.response?.status;
+    const data = error?.response?.data;
+    const message =
+      data?.msg ||               
+      data?.error ||
+      data?.message ||
+      error.message ||
+      'Request failed';
+    const err = new Error(message);
+    err.status = status;
+    err.data = data;
+    return Promise.reject(err);
+  }
 );
+
 
 api.interceptors.response.use(
   (res) => res,
